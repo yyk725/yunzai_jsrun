@@ -38,7 +38,7 @@ export class jsrun extends plugin {
 
 	async jsrun(e) {
 		if (return_guest_code) {
-			if (!e.isMaster) return e.reply("主人不允许你使用此插件哦！")
+			if (!e.isMaster) return e.reply("未开放访客权限")
 		}
 		try {
 			const content = e.message[0].text.split("##")[1]
@@ -62,9 +62,9 @@ export class jsrun extends plugin {
 
 	async cmd(e) {
 		if (return_guest_code) {
-			if (!e.isMaster) return e.reply("主人不允许你使用此插件哦！")
+			if (!e.isMaster) return e.reply("未开放访客权限")
 		}
-		const content = e.message[0].text.slice(5)
+		const content = e.message[0].text.split("#cmd")[1]
 		if (content == "") return
 		await runcmd(e, content)
 	}
@@ -88,10 +88,10 @@ export class jsrun extends plugin {
 				break;
 		}
 		let settingsmsg = [
-			"仅主人可运行js程序："+return_guest_code,
-			"\ncmd输出转为utf-8："+change_to_utf8,
-			"\n使用合并转发回复："+outforward,
-			"\ncmd超时时间："+timeout, " 秒"
+			"权限：仅主人可使用插件："+return_guest_code,
+			"\n编码：cmd输出转utf-8："+change_to_utf8,
+			"\n合并转发：使用合并转发回复："+outforward,
+			"\n超时：cmd超时时间："+timeout, " 秒"
 		]
 		e.reply(settingsmsg)
 	}
