@@ -21,7 +21,7 @@ export class jsrun extends plugin {
 			priority: 500,
 			rule: [
 				{
-					reg: "^##(.*)",
+					reg: "^/(.*)",
 					fnc: 'jsrun'
 				},
 				{
@@ -41,7 +41,7 @@ export class jsrun extends plugin {
 			if (!e.isMaster) return e.reply("未开放访客权限")
 		}
 		try {
-			const content = e.message[0].text.split("##")[1]
+			const content = e.message[0].text.split("/")[1]
 			if (content === undefined) return
 
 			let res = await eval(content);
