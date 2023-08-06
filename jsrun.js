@@ -18,14 +18,14 @@ export class jsrun extends plugin {
 		super({
 			name: '指令运行工具',
 			event: 'message',
-			priority: 500,
+			priority: 0,
 			rule: [
 				{
 					reg: "^/(.*)",
 					fnc: 'jsrun'
 				},
 				{
-					reg: "^#cmd(.*)",
+					reg: "^&(.*)",
 					fnc: 'cmd'
 				},
 				{
@@ -41,7 +41,7 @@ export class jsrun extends plugin {
 			if (!e.isMaster) return e.reply("未开放访客权限")
 		}
 		try {
-			const content = e.message[0].text.split("/")[1]
+			const content = e.message[0].text.slice(1)
 			if (content === undefined) return
 
 			let res = await eval(content);
@@ -64,7 +64,7 @@ export class jsrun extends plugin {
 		if (return_guest_code) {
 			if (!e.isMaster) return e.reply("未开放访客权限")
 		}
-		const content = e.message[0].text.split("#cmd")[1]
+		const content = e.message[0].text.slice(1)
 		if (content == "") return
 		await runcmd(e, content)
 	}
@@ -88,10 +88,10 @@ export class jsrun extends plugin {
 				break;
 		}
 		let settingsmsg = [
-			"权限：仅主人可使用插件："+return_guest_code,
-			"\n编码：cmd输出转utf-8："+change_to_utf8,
-			"\n合并转发：使用合并转发回复："+outforward,
-			"\n超时：cmd超时时间："+timeout, " 秒"
+			"权限："+return_guest_code,
+			"\n编码："+change_to_utf8,
+			"\n合并转发："+outforward,
+			"\n超时："+timeout, " 秒"
 		]
 		e.reply(settingsmsg)
 	}
