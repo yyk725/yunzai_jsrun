@@ -1,9 +1,11 @@
 import { exec } from "child_process"
+import common from "../../lib/common/common.js"
 const GBK = new TextDecoder("GBK")
 //下面是运行js代码时可用的库，想使用更多库请在下面导入
 import fs from "fs"
 import { segment } from "oicq"
 import axios from "axios"
+import puppeteer from '../../lib/puppeteer/puppeteer.js'
 
 //默认配置项，可用#js设置临时更改
 let return_guest_code = true//是否允许非主人运行cmd程序，不建议更改
@@ -38,7 +40,7 @@ export class jsrun extends plugin {
 
 	async jsrun(e) {
 		if (return_guest_code) {
-			if (!e.isMaster) return e.reply("未开放访客权限")
+			if (!e.isMaster) return 0
 		}
 		try {
 			const content = e.message[0].text.slice(1)
@@ -62,7 +64,7 @@ export class jsrun extends plugin {
 
 	async cmd(e) {
 		if (return_guest_code) {
-			if (!e.isMaster) return e.reply("未开放访客权限")
+			if (!e.isMaster) return 0
 		}
 		const content = e.message[0].text.slice(1)
 		if (content == "") return
@@ -88,10 +90,10 @@ export class jsrun extends plugin {
 				break;
 		}
 		let settingsmsg = [
-			"权限："+return_guest_code,
-			"\n编码："+change_to_utf8,
-			"\n合并转发："+outforward,
-			"\n超时："+timeout, " 秒"
+			"权限：" + return_guest_code,
+			"\n编码：" + change_to_utf8,
+			"\n合并转发：" + outforward,
+			"\n超时：" + timeout, " 秒"
 		]
 		e.reply(settingsmsg)
 	}
@@ -110,19 +112,16 @@ async function runcmd(e, data) {
 }
 
 async function sendForwardMsg(e, data) {
-	let forwardMsg = [{ message: e.msg, nickname: e.sender.card || e.sender.nickname, user_id: e.sender.user_id }]
+	let forwardMsg = []
 	if (data.length > 10000) {
-		forwardMsg.push({
-			message: `结果过长，将只显示10000字 (${((10000 / data.length) * 100).toFixed(2)}%)`,
-			nickname: Bot.nickname, user_id: Bot.uin
-		})
+		forwardMsg.push([`结果过长，将只显示10000字 (${((10000 / data.length) * 100).toFixed(2)}%)`])
 		data = data.substring(0, 10000)
 	}
-	forwardMsg.push({ message: data, nickname: Bot.nickname, user_id: Bot.uin })
+	forwardMsg.push([data])
 	if (e.isGroup) {
-		forwardMsg = await e.group.makeForwardMsg(forwardMsg)
+		forwardMsg = await common.makeForwardMsg(e, forwardMsg, `命令运行结果`)
 	} else {
-		forwardMsg = await e.friend.makeForwardMsg(forwardMsg)
+		forwardMsg = await common.makeForwardMsg(e, forwardMsg, `命令运行结果`)
 	}
 	e.reply(forwardMsg)
 }
