@@ -7,11 +7,11 @@ import { segment } from "oicq"
 import axios from "axios"
 import puppeteer from '../../lib/puppeteer/puppeteer.js'
 
-//默认配置项，可用#js设置临时更改
-let return_guest_code = true//是否允许非主人运行cmd程序，不建议更改
+//默认配置项，可用 #js设置 临时更改
+let master_only = true//是否允许非主人运行cmd程序，不建议更改
 let change_to_utf8 = false//是否将cmd程序的运行输出转为utf8
 let outforward = false//是否以合并转发形式回复，可避免刷屏
-let timeout = 60//cmd指令的超时时间，单位为秒
+let timeout = 30//cmd指令的超时时间，单位为秒
 
 let settingsreg = new RegExp('^#js设置(权限|编码|合并转发|超时)*(.*)*')
 
@@ -39,8 +39,8 @@ export class jsrun extends plugin {
 	}
 
 	async jsrun(e) {
-		if (return_guest_code) {
-			if (!e.isMaster) return 0
+		if (master_only) {
+			if (!e.isMaster) return console.error(`有坏人(${e.sender.user_id})想要修改你的电脑！`);
 		}
 		try {
 			const content = e.message[0].text.slice(1)
@@ -51,10 +51,10 @@ export class jsrun extends plugin {
 			if (typeof output !== 'string') output = JSON.stringify(output, null, 4);
 			if (output === undefined) return e.reply("程序无返回值");
 
-			if (outforward) {
-				await sendForwardMsg(e, output)
+			if (content.includes('reply')) {
+				return 0
 			} else {
-				await e.reply(output)
+				if (outforward) { await sendForwardMsg(e, output) } else { await e.reply(output) }
 			}
 		} catch (error) {
 			await e.reply('错误：\n' + error.message)
@@ -63,9 +63,10 @@ export class jsrun extends plugin {
 	}
 
 	async cmd(e) {
-		if (return_guest_code) {
-			if (!e.isMaster) return 0
-		}
+		if (!e.isMaster) return 0
+		/**if (master_only) {
+			if (!e.isMaster) return console.error(`有坏人(${e.sender.user_id})想要修改你的电脑！`);
+		}**/
 		const content = e.message[0].text.slice(1)
 		if (content == "") return
 		await runcmd(e, content)
@@ -77,7 +78,7 @@ export class jsrun extends plugin {
 		let value = regRet[2]
 		switch (name) {
 			case "权限":
-				return_guest_code = eval(value)
+				master_only = eval(value)
 				break;
 			case "编码":
 				change_to_utf8 = eval(value)
@@ -90,7 +91,7 @@ export class jsrun extends plugin {
 				break;
 		}
 		let settingsmsg = [
-			"权限：" + return_guest_code,
+			"权限：" + master_only,
 			"\n编码：" + change_to_utf8,
 			"\n合并转发：" + outforward,
 			"\n超时：" + timeout, " 秒"
