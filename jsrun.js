@@ -51,11 +51,7 @@ export class jsrun extends plugin {
 			if (typeof output !== 'string') output = JSON.stringify(output, null, 4);
 			if (output === undefined) return e.reply("程序无返回值");
 
-			if (content.includes('reply')) {
-				return 0
-			} else {
-				if (outforward) { await sendForwardMsg(e, output) } else { await e.reply(output) }
-			}
+			if (outforward) { await sendForwardMsg(e, output) } else { await e.reply(output) }
 		} catch (error) {
 			await e.reply('错误：\n' + error.message)
 			console.log(error)
