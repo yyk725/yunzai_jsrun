@@ -25,9 +25,8 @@
 #### 参与贡献
 
 1.  Fork 本仓库
-2.  新建 Feat_xxx 分支
-3.  提交代码
-4.  新建 Pull Request
+2.  修改代码
+3.  新建 Pull Request
 
 #### 联系作者
 QQ：2901136436
