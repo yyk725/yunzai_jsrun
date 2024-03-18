@@ -23,11 +23,11 @@ export class jsrun extends plugin {
 			priority: 0,
 			rule: [
 				{
-					reg: "^/(.*)",
+					reg: "^/js(.*)",
 					fnc: 'jsrun'
 				},
 				{
-					reg: "^&(.*)",
+					reg: "^/exec(.*)",
 					fnc: 'cmd'
 				},
 				{
@@ -43,7 +43,7 @@ export class jsrun extends plugin {
 			if (!e.isMaster) return console.error(`有坏人(${e.sender.user_id})想要修改你的电脑！`);
 		}
 		try {
-			const content = e.message[0].text.slice(1)
+			const content = e.message[0].text.split("/js")[1]
 			if (content === undefined) return
 
 			let res = await eval(content);
@@ -63,7 +63,7 @@ export class jsrun extends plugin {
 		/**if (master_only) {
 			if (!e.isMaster) return console.error(`有坏人(${e.sender.user_id})想要修改你的电脑！`);
 		}**/
-		const content = e.message[0].text.slice(1)
+		const content = e.message[0].text.split("/exec")[1]
 		if (content == "") return
 		await runcmd(e, content)
 	}
