@@ -6,7 +6,7 @@
 
 #### 安装教程
 
-将js文件复制到/plugins/example文件夹
+将jsrun.js下载并复制到/plugins/example文件夹
 
 #### 使用说明
 
