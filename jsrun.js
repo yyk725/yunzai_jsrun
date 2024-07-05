@@ -4,7 +4,6 @@ const GBK = new TextDecoder("GBK")
 //下面是运行js代码时可用的库，想使用更多库请在下面导入
 import fs from "fs"
 import { segment } from "oicq"
-import axios from "axios"
 import puppeteer from '../../lib/puppeteer/puppeteer.js'
 
 //默认配置项，可用 #js设置 临时更改
