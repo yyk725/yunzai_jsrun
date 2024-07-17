@@ -5,7 +5,7 @@ export class xiaofei_violation_query extends plugin {
 	constructor() {
 		super({
 			/** 功能名称 */
-			name: '机器人违规查询',
+			name: 'qq账号违规查询',
 			/** 功能描述 */
 			dsc: '',
 			/** https://oicqjs.github.io/oicq/#events */
