@@ -39,7 +39,7 @@ export class jsrun extends plugin {
 	}
 
 	async jsrun(e) {
-		if (master_only && !e.isMaster) return 0}
+		if (master_only && !e.isMaster) return 0
 		try {
 			const content = e.message[0].text.split("/js")[1]
 			if (content === undefined) return
