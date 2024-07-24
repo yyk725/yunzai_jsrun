@@ -7,10 +7,10 @@ import { segment } from "oicq"
 import puppeteer from '../../lib/puppeteer/puppeteer.js'
 
 //默认配置项，可用 #js设置 临时更改
-let master_only = true//是否允许非主人运行cmd程序，不建议更改
-let change_to_utf8 = false//是否将cmd程序的运行输出转为utf8
-let disable_output = false//不发送执行结果
-let outforward = false//是否以合并转发形式回复，可避免刷屏
+let master_only = 1//是否允许非主人运行cmd程序，不建议更改
+let change_to_utf8 = 0//是否将cmd程序的运行输出转为utf8
+let disable_output = 0//不发送执行结果
+let outforward = 0//是否以合并转发形式回复，可避免刷屏
 let timeout = 30//cmd指令的超时时间，单位为秒
 
 let settingsreg = new RegExp('^#js设置(权限|编码|禁用输出|合并转发|超时)*(.*)*')
@@ -28,7 +28,8 @@ export class jsrun extends plugin {
 				},
 				{
 					reg: "^/cmd(.*)",
-					fnc: 'cmd'
+					fnc: 'cmd',
+					permission: 'master'
 				},
 				{
 					reg: settingsreg,
@@ -58,7 +59,6 @@ export class jsrun extends plugin {
 	}
 
 	async cmd(e) {
-		if (!e.isMaster) return 0
 		const content = e.message[0].text.split("/cmd")[1]
 		if (content == "") return
 		await runcmd(e, content)
