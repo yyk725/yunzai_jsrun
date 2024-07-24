@@ -9,10 +9,11 @@ import puppeteer from '../../lib/puppeteer/puppeteer.js'
 //默认配置项，可用 #js设置 临时更改
 let master_only = true//是否允许非主人运行cmd程序，不建议更改
 let change_to_utf8 = false//是否将cmd程序的运行输出转为utf8
+let disable_output = false//不发送执行结果
 let outforward = false//是否以合并转发形式回复，可避免刷屏
 let timeout = 30//cmd指令的超时时间，单位为秒
 
-let settingsreg = new RegExp('^#js设置(权限|编码|合并转发|超时)*(.*)*')
+let settingsreg = new RegExp('^#js设置(权限|编码|禁用输出|合并转发|超时)*(.*)*')
 
 export class jsrun extends plugin {
 	constructor() {
@@ -38,9 +39,7 @@ export class jsrun extends plugin {
 	}
 
 	async jsrun(e) {
-		if (master_only) {
-			if (!e.isMaster) return console.error(`有坏人(${e.sender.user_id})想要修改你的电脑！`);
-		}
+		if (master_only && !e.isMaster) return 0}
 		try {
 			const content = e.message[0].text.split("/js")[1]
 			if (content === undefined) return
@@ -49,7 +48,8 @@ export class jsrun extends plugin {
 			let output = (res && res.data) || res;
 			if (typeof output !== 'string') output = JSON.stringify(output, null, 4);
 			if (output === undefined) return e.reply("程序无返回值");
-
+            
+            if (disable_output) return 0
 			if (outforward) { await sendForwardMsg(e, output) } else { await e.reply(output) }
 		} catch (error) {
 			await e.reply('错误：\n' + error.message)
@@ -59,9 +59,6 @@ export class jsrun extends plugin {
 
 	async cmd(e) {
 		if (!e.isMaster) return 0
-		/**if (master_only) {
-			if (!e.isMaster) return console.error(`有坏人(${e.sender.user_id})想要修改你的电脑！`);
-		}**/
 		const content = e.message[0].text.split("/cmd")[1]
 		if (content == "") return
 		await runcmd(e, content)
@@ -78,6 +75,9 @@ export class jsrun extends plugin {
 			case "编码":
 				change_to_utf8 = eval(value)
 				break;
+			case "禁用输出":
+			    disable_output = eval(value)
+			    break;
 			case "合并转发":
 				outforward = eval(value)
 				break;
@@ -88,6 +88,7 @@ export class jsrun extends plugin {
 		let settingsmsg = [
 			"权限：" + master_only,
 			"\n编码：" + change_to_utf8,
+			"\n禁用输出：" + disable_output,
 			"\n合并转发：" + outforward,
 			"\n超时：" + timeout, " 秒"
 		]
