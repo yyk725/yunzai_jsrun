@@ -7,7 +7,7 @@ import { segment } from "oicq"
 import puppeteer from '../../lib/puppeteer/puppeteer.js'
 
 //默认配置项，可用 #js设置 临时更改
-let master_only = 1//是否允许非主人运行cmd程序，不建议更改
+let master_only = 1//是否允许非主人运行js
 let change_to_utf8 = 0//是否将cmd程序的运行输出转为utf8
 let disable_output = 0//不发送执行结果
 let outforward = 0//是否以合并转发形式回复，可避免刷屏
@@ -23,12 +23,17 @@ export class jsrun extends plugin {
 			priority: 0,
 			rule: [
 				{
-					reg: "^/js(.*)",
+					reg: "^*js(.*)",
 					fnc: 'jsrun'
 				},
 				{
-					reg: "^/cmd(.*)",
+					reg: "^*cmd(.*)",
 					fnc: 'cmd',
+					permission: 'master'
+				},
+				{
+					reg: "^*ps(.*)",
+					fnc: 'powershell',
 					permission: 'master'
 				},
 				{
@@ -42,7 +47,7 @@ export class jsrun extends plugin {
 	async jsrun(e) {
 		if (master_only && !e.isMaster) return 0
 		try {
-			const content = e.message[0].text.split("/js")[1]
+			const content = e.message[0].text.split("*js")[1]
 			if (content === undefined) return
 
 			let res = await eval(content);
@@ -59,9 +64,15 @@ export class jsrun extends plugin {
 	}
 
 	async cmd(e) {
-		const content = e.message[0].text.split("/cmd")[1]
+		const content = e.message[0].text.split("*cmd")[1]
 		if (content == "") return
 		await runcmd(e, content)
+	}
+
+	async powershell(e) {
+		const content = e.message[0].text.split("*ps")[1]
+		if (content == "") return
+		await runpowershell(e, content)
 	}
 
 	async settings(e) {
@@ -98,6 +109,18 @@ export class jsrun extends plugin {
 
 async function runcmd(e, data) {
 	exec(data, { encoding: '', timeout: timeout * 1000 }, (err, stdout, stderr) => {
+		if (err) {
+			if (err.killed) return e.reply("执行时间过长，该命令已被终止", { at: true })
+			e.reply(String('错误：\n' + GBK.decode(stderr)))
+		} else {
+			if (change_to_utf8) { stdout = String(stdout) } else { stdout = String(GBK.decode(stdout)) }
+			if (outforward) { sendForwardMsg(e, stdout) } else { e.reply(stdout) }
+		}
+	})
+}
+
+async function runpowershell(e, data) {
+	exec('powershell.exe -NoProfile -Command '+data, { encoding: '', timeout: timeout * 1000 }, (err, stdout, stderr) => {
 		if (err) {
 			if (err.killed) return e.reply("执行时间过长，该命令已被终止", { at: true })
 			e.reply(String('错误：\n' + GBK.decode(stderr)))
