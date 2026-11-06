@@ -23,16 +23,16 @@ export class jsrun extends plugin {
 			priority: 0,
 			rule: [
 				{
-					reg: "^*js(.*)",
+					reg: "^&js(.*)",
 					fnc: 'jsrun'
 				},
 				{
-					reg: "^*cmd(.*)",
+					reg: "^&cmd(.*)",
 					fnc: 'cmd',
 					permission: 'master'
 				},
 				{
-					reg: "^*ps(.*)",
+					reg: "^&ps(.*)",
 					fnc: 'powershell',
 					permission: 'master'
 				},
@@ -47,7 +47,7 @@ export class jsrun extends plugin {
 	async jsrun(e) {
 		if (master_only && !e.isMaster) return 0
 		try {
-			const content = e.message[0].text.split("*js")[1]
+			const content = e.message[0].text.split("&js")[1]
 			if (content === undefined) return
 
 			let res = await eval(content);
@@ -64,13 +64,13 @@ export class jsrun extends plugin {
 	}
 
 	async cmd(e) {
-		const content = e.message[0].text.split("*cmd")[1]
+		const content = e.message[0].text.split("&cmd")[1]
 		if (content == "") return
 		await runcmd(e, content)
 	}
 
 	async powershell(e) {
-		const content = e.message[0].text.split("*ps")[1]
+		const content = e.message[0].text.split("&ps")[1]
 		if (content == "") return
 		await runpowershell(e, content)
 	}
