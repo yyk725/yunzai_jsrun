@@ -47,7 +47,7 @@ export class jsrun extends plugin {
 	async jsrun(e) {
 		if (master_only && !e.isMaster) return 0
 		try {
-			const content = e.message[0].text.split("&js")[1]
+			const content = e.message[0].text.replace(/^&js\s*/, '').trim();
 			if (content === undefined) return
 
 			let res = await eval(content);
@@ -64,13 +64,13 @@ export class jsrun extends plugin {
 	}
 
 	async cmd(e) {
-		const content = e.message[0].text.split("&cmd")[1]
+		const content = e.message[0].text.replace(/^&cmd\s*/, '').trim();
 		if (content == "") return
 		await runcmd(e, content)
 	}
 
 	async powershell(e) {
-		const content = e.message[0].text.split("&ps")[1]
+		const content = e.message[0].text.replace(/^&ps\s*/, '').trim();
 		if (content == "") return
 		await runpowershell(e, content)
 	}
@@ -113,7 +113,7 @@ async function runcmd(e, data) {
 			if (err.killed) return e.reply("执行时间过长，该命令已被终止", { at: true })
 			e.reply(String('错误：\n' + GBK.decode(stderr)))
 		} else {
-			if (change_to_utf8) { stdout = String(stdout) } else { stdout = String(GBK.decode(stdout)) }
+			if (change_to_utf8) { stdout = String(stdout).trim() } else { stdout = String(GBK.decode(stdout)).trim() }
 			if (outforward) { sendForwardMsg(e, stdout) } else { e.reply(stdout) }
 		}
 	})
@@ -125,7 +125,7 @@ async function runpowershell(e, data) {
 			if (err.killed) return e.reply("执行时间过长，该命令已被终止", { at: true })
 			e.reply(String('错误：\n' + GBK.decode(stderr)))
 		} else {
-			if (change_to_utf8) { stdout = String(stdout) } else { stdout = String(GBK.decode(stdout)) }
+			if (change_to_utf8) { stdout = String(stdout).trim() } else { stdout = String(GBK.decode(stdout)).trim() }
 			if (outforward) { sendForwardMsg(e, stdout) } else { e.reply(stdout) }
 		}
 	})
