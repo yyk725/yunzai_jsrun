@@ -49,6 +49,7 @@ export class jsrun extends plugin {
 		try {
 			const content = e.message[0].text.replace(/^&js\s*/, '').trim();
 			if (content === undefined) return
+			console.log(e.sender.nickname+' ('+e.sender.user_id+') '+'正在执行: '+content)
 
 			let res = await eval(content);
 			let output = (res && res.data) || res;
@@ -66,12 +67,14 @@ export class jsrun extends plugin {
 	async cmd(e) {
 		const content = e.message[0].text.replace(/^&cmd\s*/, '').trim();
 		if (content == "") return
+		console.log(e.sender.nickname+' ('+e.sender.user_id+') '+'正在执行: '+content)
 		await runcmd(e, content)
 	}
 
 	async powershell(e) {
 		const content = e.message[0].text.replace(/^&ps\s*/, '').trim();
 		if (content == "") return
+		console.log(e.sender.nickname+' ('+e.sender.user_id+') '+'正在执行: '+content)
 		await runpowershell(e, content)
 	}
 
